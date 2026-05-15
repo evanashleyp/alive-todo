@@ -1,5 +1,5 @@
 from app.llm.client import generate_response
-
+from app.memory.store import load_memory, save_memory
 
 def main():
     print("Alive Todo started.\n")
@@ -12,6 +12,17 @@ def main():
             break
 
         response = generate_response(user_input)
+
+        memory = load_memory()
+
+        memory["last_task"] = user_input
+        memory["last_state"] = "working"
+
+        memory["recent_actions"].append(user_input)
+
+        memory["recent_actions"] = memory["recent_actions"][-5:]
+
+        save_memory(memory)
 
         print(f"\nAlive: {response}\n")
 
