@@ -23,6 +23,9 @@ Recent actions: {memory['recent_actions']}
                 "content": user_input,
             },
         ],
+        options={
+            "temperature": 0.7,
+        }
     )
 
     return response["message"]["content"]
