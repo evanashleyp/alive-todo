@@ -1,5 +1,8 @@
+from statistics import mode
+
 from app.llm.client import generate_response
 from app.memory.store import load_memory, save_memory
+from app.modes.detector import detect_mode
 
 def main():
     print("Alive Todo started.\n")
@@ -7,10 +10,14 @@ def main():
     while True:
         user_input = input("You: ")
 
+
         if user_input.lower() in ["exit", "quit"]:
             print("Alive Todo stopped.")
             break
 
+        mode = detect_mode(user_input)
+        print(f"[Mode: {mode}]")
+        
         response = generate_response(user_input)
 
         memory = load_memory()
