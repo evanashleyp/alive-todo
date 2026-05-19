@@ -9,9 +9,11 @@ def generate_response(user_input: str) -> str:
     mode = detect_mode(user_input)
 
     memory_context = f"""
-Last task: {memory['last_task']}
-Last state: {memory['last_state']}
-Recent actions: {memory['recent_actions']}
+Current focus: {memory['current_focus']}
+Energy state: {memory['energy_state']}
+Recent topics: {memory['recent_topics']}
+Active tasks: {memory['active_tasks']}
+completed thoughts: {memory['completed_thoughts']}
 """
 
 

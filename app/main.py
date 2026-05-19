@@ -1,5 +1,3 @@
-from statistics import mode
-
 from app.llm.client import generate_response
 from app.memory.store import load_memory, save_memory
 from app.modes.detector import detect_mode
@@ -11,7 +9,9 @@ from app.queue.task_queue import task_queue, completed_tasks
 
 import time
 
+
 def main():
+    memory = load_memory()
     print("Alive Todo started.\n")
 
     worker_thread = threading.Thread(target=start_worker, daemon=True)
@@ -20,6 +20,17 @@ def main():
     while True:
         while completed_tasks:
             completed = completed_tasks.pop(0)
+
+            task_content = completed["task_content"]
+
+            if task_content in memory["active_tasks"]:
+                memory["active_tasks"].remove(task_content)
+
+            memory["completed_thoughts"].append(task_content)
+
+            memory["completed_thoughts"] = memory["completed_thoughts"][-5:]
+
+            save_memory(memory)
 
             print(
                 f"\nAlive (async) [task #{completed['id']}]: "
@@ -49,23 +60,39 @@ def main():
                 "created_at": time.time(),
                 "mode": mode,
             }
+
+            memory["active_tasks"].append(task["content"])
+
+            memory["active_tasks"] = memory["active_tasks"][-5:]
             
             print(f"\nAlive: aku pikirin dulu ya... [task #{task['id']}]\n")
 
             task_queue.put(task)
 
+            memory["current_focus"] = user_input
+
+            save_memory(memory)
+
             continue
         
         response = generate_response(user_input)
 
-        memory = load_memory()
 
-        memory["last_task"] = user_input
-        memory["last_state"] = "working"
+        memory["current_focus"] = user_input
 
-        memory["recent_actions"].append(user_input)
+        if mode == "low_energy":
+            memory["energy_state"] = "low"
 
-        memory["recent_actions"] = memory["recent_actions"][-5:]
+        elif mode == "focus_flow":
+            memory["energy_state"] = "focused"
+
+        else:
+            memory["energy_state"] = "neutral"
+
+
+        memory["recent_topics"].append(user_input)
+
+        memory["recent_topics"] = memory["recent_topics"][-5:]
 
         save_memory(memory)
 

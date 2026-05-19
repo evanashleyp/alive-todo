@@ -20,6 +20,7 @@ def start_worker():
         completed_tasks.append({
             "id": task["id"],
             "response": response,
+            "task_content": task["content"],
         })
 
         task_queue.task_done()
