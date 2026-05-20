@@ -9,6 +9,8 @@ from app.queue.task_queue import task_queue, completed_tasks
 
 import time
 
+from app.tasks.router import detect_task_type
+
 
 def main():
     memory = load_memory()
@@ -47,6 +49,9 @@ def main():
         mode = detect_mode(user_input)
         print(f"[Mode: {mode}]")
 
+        task_type = detect_task_type(user_input)
+        print(f"[Task Type: {task_type}]")
+
         if "deep" in user_input.lower() or "architecture" in user_input.lower():
 
             from app.queue import task_queue as queue_state
@@ -55,10 +60,15 @@ def main():
 
             task = {
                 "id": queue_state.task_counter,
-                "type": "deep_thought",
+                "type": task_type,
                 "content": user_input,
                 "created_at": time.time(),
                 "mode": mode,
+                "context": {
+                    "focus": memory["current_focus"],
+                    "recent_topics": memory["recent_topics"],
+                    "energy_state": memory["energy_state"],
+                },
             }
 
             memory["active_tasks"].append(task["content"])

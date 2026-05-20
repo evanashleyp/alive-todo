@@ -12,10 +12,16 @@ def start_worker():
             break
 
         user_input = task["content"]
+        context = task["context"]
+        task_type = task["type"]
 
         time.sleep(5)
 
-        response = generate_response(user_input)
+        response = generate_response(
+            user_input, 
+            context=context,
+            task_type=task_type
+        )
 
         completed_tasks.append({
             "id": task["id"],
